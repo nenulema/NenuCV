@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: #0f172a;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  body::before {
+    content: "DOKUMEN RESMI CV NENU HOKYANTO\A\ADokumen resmi CV dalam format PDF lengkap bersifat rahasia dan hanya diberikan atas izin/permintaan langsung.\ASilakan hubungi via Email: nenuhokka@gmail.com atau WhatsApp: +62 812-4175-3745.";
+    white-space: pre-wrap;
+    visibility: visible !important;
+    display: block !important;
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    right: 50px;
+    font-size: 14pt;
+    font-weight: bold;
+    color: #0f172a;
+    line-height: 1.6;
+    padding: 24px;
+    border: 2px solid #0f172a;
+    border-radius: 8px;
+    background: #f8fafc;
+  }
+}
