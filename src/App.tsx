@@ -108,6 +108,7 @@ export default function App() {
   };
 
   const persistDatabase = async (updated: PortfolioDatabase) => {
+    if (!isEditor) return;
     setDatabase(updated);
     await savePortfolioData(updated);
     triggerSavedNotice();
@@ -115,6 +116,7 @@ export default function App() {
 
   // Project Actions
   const handleSaveProject = async (project: ProjectItem) => {
+    if (!isEditor) return;
     const existingIndex = database.projects.findIndex((p) => p.id === project.id);
     let updatedProjects: ProjectItem[];
     if (existingIndex >= 0) {
@@ -128,6 +130,7 @@ export default function App() {
   };
 
   const handleDeleteProject = async (id: string) => {
+    if (!isEditor) return;
     const updatedDb = {
       ...database,
       projects: database.projects.filter((p) => p.id !== id),
@@ -137,6 +140,7 @@ export default function App() {
 
   // Experience Actions
   const handleSaveExperience = async (exp: WorkExperienceItem) => {
+    if (!isEditor) return;
     const existingIndex = database.experiences.findIndex((e) => e.id === exp.id);
     let updatedExp: WorkExperienceItem[];
     if (existingIndex >= 0) {
@@ -150,6 +154,7 @@ export default function App() {
   };
 
   const handleDeleteExperience = async (id: string) => {
+    if (!isEditor) return;
     const updatedDb = {
       ...database,
       experiences: database.experiences.filter((e) => e.id !== id),
@@ -159,6 +164,7 @@ export default function App() {
 
   // Certificate Actions
   const handleSaveCertificate = async (cert: CertificateItem) => {
+    if (!isEditor) return;
     const existingIndex = database.certificates.findIndex((c) => c.id === cert.id);
     let updatedCerts: CertificateItem[];
     if (existingIndex >= 0) {
@@ -172,6 +178,7 @@ export default function App() {
   };
 
   const handleDeleteCertificate = async (id: string) => {
+    if (!isEditor) return;
     const updatedDb = {
       ...database,
       certificates: database.certificates.filter((c) => c.id !== id),
@@ -181,6 +188,7 @@ export default function App() {
 
   // Skill Actions
   const handleSaveSkill = async (skill: SkillItem, originalName?: string) => {
+    if (!isEditor) return;
     const targetName = originalName || skill.name;
     const existingIndex = database.skills.findIndex((s) => s.name === targetName);
     let updatedSkills: SkillItem[];
@@ -195,6 +203,7 @@ export default function App() {
   };
 
   const handleDeleteSkill = async (skillName: string) => {
+    if (!isEditor) return;
     const updatedDb = {
       ...database,
       skills: database.skills.filter((s) => s.name !== skillName),
@@ -204,6 +213,7 @@ export default function App() {
 
   // Reset database to CV seed
   const handleResetDatabase = async () => {
+    if (!isEditor) return;
     const fresh = await resetPortfolioData();
     setDatabase(fresh);
     triggerSavedNotice();
@@ -263,14 +273,20 @@ export default function App() {
           lang={lang}
           isEditor={isEditor}
           onOpenCvModal={() => setIsCvModalOpen(true)}
-          onOpenAdmin={() => setIsAdminDrawerOpen(true)}
-          onUpdatePhoto={(newPhotoUrl) => {
-            const updated = {
-              ...database,
-              profile: { ...database.profile, photoUrl: newPhotoUrl },
-            };
-            persistDatabase(updated);
+          onOpenAdmin={() => {
+            if (isEditor) setIsAdminDrawerOpen(true);
           }}
+          onUpdatePhoto={
+            isEditor
+              ? (newPhotoUrl) => {
+                  const updated = {
+                    ...database,
+                    profile: { ...database.profile, photoUrl: newPhotoUrl },
+                  };
+                  persistDatabase(updated);
+                }
+              : undefined
+          }
         />
 
         {/* Portfolio Projects Section */}
@@ -280,14 +296,16 @@ export default function App() {
           isEditor={isEditor}
           onSelectProject={(project) => setSelectedProject(project)}
           onEditProject={(project) => {
+            if (!isEditor) return;
             setEditingProject(project);
             setIsProjectEditOpen(true);
           }}
           onAddProject={() => {
+            if (!isEditor) return;
             setEditingProject(null);
             setIsProjectEditOpen(true);
           }}
-          onDeleteProject={handleDeleteProject}
+          onDeleteProject={isEditor ? handleDeleteProject : undefined}
         />
 
         {/* Work Experience Timeline */}
@@ -296,14 +314,16 @@ export default function App() {
           lang={lang}
           isEditor={isEditor}
           onAddExperience={() => {
+            if (!isEditor) return;
             setEditingExperience(null);
             setIsExperienceEditOpen(true);
           }}
           onEditExperience={(exp) => {
+            if (!isEditor) return;
             setEditingExperience(exp);
             setIsExperienceEditOpen(true);
           }}
-          onDeleteExperience={handleDeleteExperience}
+          onDeleteExperience={isEditor ? handleDeleteExperience : undefined}
         />
 
         {/* Certificates & Achievements */}
@@ -312,14 +332,16 @@ export default function App() {
           lang={lang}
           isEditor={isEditor}
           onAddCertificate={() => {
+            if (!isEditor) return;
             setEditingCertificate(null);
             setIsCertificateEditOpen(true);
           }}
           onEditCertificate={(cert) => {
+            if (!isEditor) return;
             setEditingCertificate(cert);
             setIsCertificateEditOpen(true);
           }}
-          onDeleteCertificate={handleDeleteCertificate}
+          onDeleteCertificate={isEditor ? handleDeleteCertificate : undefined}
         />
 
         {/* Skills & Technical Matrix */}
@@ -328,14 +350,19 @@ export default function App() {
           lang={lang}
           isEditor={isEditor}
           onAddSkill={() => {
+            if (!isEditor) return;
             setEditingSkill(null);
             setIsSkillEditOpen(true);
           }}
-          onEditSkill={(skill) => {
-            setEditingSkill(skill);
-            setIsSkillEditOpen(true);
-          }}
-          onDeleteSkill={handleDeleteSkill}
+          onEditSkill={
+            isEditor
+              ? (skill) => {
+                  setEditingSkill(skill);
+                  setIsSkillEditOpen(true);
+                }
+              : undefined
+          }
+          onDeleteSkill={isEditor ? handleDeleteSkill : undefined}
         />
 
         {/* Direct Contacts & Fast Inquiry */}
@@ -348,7 +375,9 @@ export default function App() {
         isEditor={isEditor}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onOpenCvModal={() => setIsCvModalOpen(true)}
-        onOpenAdmin={() => setIsAdminDrawerOpen(true)}
+        onOpenAdmin={() => {
+          if (isEditor) setIsAdminDrawerOpen(true);
+        }}
       />
 
       {/* Modals & Drawers */}
@@ -358,51 +387,60 @@ export default function App() {
         isEditor={isEditor}
         onClose={() => setSelectedProject(null)}
         onEdit={(proj) => {
+          if (!isEditor) return;
           setEditingProject(proj);
           setIsProjectEditOpen(true);
         }}
       />
 
-      <ProjectEditModal
-        project={editingProject}
-        isOpen={isProjectEditOpen}
-        onClose={() => {
-          setIsProjectEditOpen(false);
-          setEditingProject(null);
-        }}
-        onSave={handleSaveProject}
-      />
+      {isEditor && isProjectEditOpen && (
+        <ProjectEditModal
+          project={editingProject}
+          isOpen={isProjectEditOpen}
+          onClose={() => {
+            setIsProjectEditOpen(false);
+            setEditingProject(null);
+          }}
+          onSave={handleSaveProject}
+        />
+      )}
 
-      <ExperienceEditModal
-        experience={editingExperience}
-        isOpen={isExperienceEditOpen}
-        onClose={() => {
-          setIsExperienceEditOpen(false);
-          setEditingExperience(null);
-        }}
-        onSave={handleSaveExperience}
-      />
+      {isEditor && isExperienceEditOpen && (
+        <ExperienceEditModal
+          experience={editingExperience}
+          isOpen={isExperienceEditOpen}
+          onClose={() => {
+            setIsExperienceEditOpen(false);
+            setEditingExperience(null);
+          }}
+          onSave={handleSaveExperience}
+        />
+      )}
 
-      <CertificateEditModal
-        certificate={editingCertificate}
-        isOpen={isCertificateEditOpen}
-        onClose={() => {
-          setIsCertificateEditOpen(false);
-          setEditingCertificate(null);
-        }}
-        onSave={handleSaveCertificate}
-      />
+      {isEditor && isCertificateEditOpen && (
+        <CertificateEditModal
+          certificate={editingCertificate}
+          isOpen={isCertificateEditOpen}
+          onClose={() => {
+            setIsCertificateEditOpen(false);
+            setEditingCertificate(null);
+          }}
+          onSave={handleSaveCertificate}
+        />
+      )}
 
-      <SkillEditModal
-        skill={editingSkill}
-        isOpen={isSkillEditOpen}
-        onClose={() => {
-          setIsSkillEditOpen(false);
-          setEditingSkill(null);
-        }}
-        onSave={handleSaveSkill}
-        onDelete={handleDeleteSkill}
-      />
+      {isEditor && isSkillEditOpen && (
+        <SkillEditModal
+          skill={editingSkill}
+          isOpen={isSkillEditOpen}
+          onClose={() => {
+            setIsSkillEditOpen(false);
+            setEditingSkill(null);
+          }}
+          onSave={handleSaveSkill}
+          onDelete={handleDeleteSkill}
+        />
+      )}
 
       {isCvModalOpen && (
         <PrintableCvModal
@@ -419,21 +457,23 @@ export default function App() {
         onLoginSuccess={handleLoginSuccess}
       />
 
-      <AdminDrawer
-        isOpen={isAdminDrawerOpen}
-        onClose={() => setIsAdminDrawerOpen(false)}
-        database={database}
-        onSaveDatabase={persistDatabase}
-        onResetDatabase={handleResetDatabase}
-        onEditProject={(proj) => {
-          setEditingProject(proj);
-          setIsProjectEditOpen(true);
-        }}
-        onAddProject={() => {
-          setEditingProject(null);
-          setIsProjectEditOpen(true);
-        }}
-      />
+      {isEditor && isAdminDrawerOpen && (
+        <AdminDrawer
+          isOpen={isAdminDrawerOpen}
+          onClose={() => setIsAdminDrawerOpen(false)}
+          database={database}
+          onSaveDatabase={persistDatabase}
+          onResetDatabase={handleResetDatabase}
+          onEditProject={(proj) => {
+            setEditingProject(proj);
+            setIsProjectEditOpen(true);
+          }}
+          onAddProject={() => {
+            setEditingProject(null);
+            setIsProjectEditOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 }

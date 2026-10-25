@@ -115,35 +115,37 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
 
-                  {/* Top quick action pills for edit / delete */}
-                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditProject(rawProj);
-                      }}
-                      className="p-1.5 text-white bg-slate-950/70 hover:bg-slate-900 backdrop-blur-md rounded-md transition-colors cursor-pointer"
-                      title="Edit Proyek"
-                      aria-label="Edit Proyek"
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                    {onDeleteProject && (
+                  {/* Top quick action pills for edit / delete - ONLY visible in Editor Mode */}
+                  {isEditor && (
+                    <div className="absolute top-2.5 right-2.5 flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm(`Hapus proyek "${rawProj.title}"?`)) {
-                            onDeleteProject(rawProj.id);
-                          }
+                          onEditProject(rawProj);
                         }}
-                        className="p-1.5 text-red-300 hover:text-white bg-slate-950/70 hover:bg-red-700 backdrop-blur-md rounded-md transition-colors cursor-pointer"
-                        title="Hapus Proyek"
-                        aria-label="Hapus Proyek"
+                        className="p-1.5 text-white bg-slate-950/70 hover:bg-slate-900 backdrop-blur-md rounded-md transition-colors cursor-pointer"
+                        title="Edit Proyek"
+                        aria-label="Edit Proyek"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Pencil className="w-3 h-3" />
                       </button>
-                    )}
-                  </div>
+                      {onDeleteProject && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(`Hapus proyek "${rawProj.title}"?`)) {
+                              onDeleteProject(rawProj.id);
+                            }
+                          }}
+                          className="p-1.5 text-red-300 hover:text-white bg-slate-950/70 hover:bg-red-700 backdrop-blur-md rounded-md transition-colors cursor-pointer"
+                          title="Hapus Proyek"
+                          aria-label="Hapus Proyek"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Bottom info on hover */}
                   <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-[11px] font-medium">
@@ -216,12 +218,14 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({
             <p className="text-xs text-slate-500">
               {t.emptyText}
             </p>
-            <button
-              onClick={onAddProject}
-              className="mt-2.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
-            >
-              {t.addNow}
-            </button>
+            {isEditor && (
+              <button
+                onClick={onAddProject}
+                className="mt-2.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
+              >
+                {t.addNow}
+              </button>
+            )}
           </div>
         )}
       </div>
